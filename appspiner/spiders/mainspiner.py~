@@ -11,7 +11,7 @@ sys.setdefaultencoding('utf-8')
 
 class appSpiner(BaseSpider):
 	name="itunes"
-	allowed_domains=["itunes.apple.com"]
+	allowed_domains=["itunes.apple"]
 	start_urls=["https://itunes.apple.com/cn/genre/ios/id36?mt=8",
 	]
 #### Main parse function, to enter into every category ####

@@ -22,6 +22,7 @@ from scrapy.exceptions import DropItem, NotConfigured, IgnoreRequest
 from scrapy.contrib.pipeline.media import MediaPipeline
 import Queue
 appnames=Queue.Queue()
+appname=""
 
 class NoimagesDrop(DropItem):
 	"""Product with no images exception"""
@@ -110,7 +111,7 @@ class S3ImagesStore(object):
 		"""Upload image to S3 storage"""
 		width, height = image.size
 		b = self._get_boto_bucket()
-		key_name = '%s%s' % (self.prefix, key)
+		_name = '%s%s' % (self.prefix, key)
 		k = b.new_key(key_name)
 		k.set_metadata('width', str(width))
 		k.set_metadata('height', str(height))
@@ -197,8 +198,12 @@ class ImagesPipeline(MediaPipeline):
 		self.inc_stats(info.spider, status)
 
 		try:
-			key = "aaa"#self.image_key(request.url)
+			#key = "aaa"#self.image_key(request.url)
 			#key="aaa"
+			if(appname!=""):
+				key=appname
+			else:
+				key="aaa"
 			checksum = self.image_downloaded(response, request, info)
 		except ImageException as exc:
 			whyfmt = 'Image (error): Error processing image from %(request)s referred in <%(referer)s>: %(errormsg)s'
@@ -246,7 +251,11 @@ class ImagesPipeline(MediaPipeline):
 			checksum = result.get('checksum', None)
 			return {'url': request.url, 'path': key, 'checksum': checksum}
 
-		key = "abcd"#self.image_key(request.url)
+		#self.image_key(request.url)
+		if(appname!=""):
+			key=appname
+		else:
+			key="aaa"
 		dfd = defer.maybeDeferred(self.store.stat_image, key, info)
 		dfd.addCallbacks(_onsuccess, lambda _: None)
 		dfd.addErrback(log.err, self.__class__.__name__ + '.store.stat_image')
